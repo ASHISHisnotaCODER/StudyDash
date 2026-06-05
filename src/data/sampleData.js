@@ -1,0 +1,143 @@
+export const AVAILABLE_SUBJECTS = [
+  {
+    id: 'power-systems',
+    name: 'Power Systems',
+    color: '#00f5ff',
+    topics: [
+      'Transmission Line Parameters',
+      'Load Flow Analysis',
+      'Fault Analysis & Short Circuit',
+      'Power System Stability',
+      'Economic Operation of Power Systems',
+      'HVDC Transmission',
+    ],
+  },
+  {
+    id: 'electrical-machines',
+    name: 'Electrical Machines',
+    color: '#8b5cf6',
+    topics: [
+      'DC Machines – Generators & Motors',
+      'Transformers – Single & Three Phase',
+      'Induction Motors',
+      'Synchronous Machines',
+      'Special Machines (BLDC, Stepper)',
+      'Drives & Speed Control',
+    ],
+  },
+  {
+    id: 'control-systems',
+    name: 'Control Systems',
+    color: '#f472b6',
+    topics: [
+      'Transfer Functions & Block Diagrams',
+      "Signal Flow Graphs (Mason's Rule)",
+      'Time Domain Analysis',
+      'Frequency Domain Analysis',
+      'Stability (Routh–Hurwitz, Nyquist)',
+      'Root Locus Technique',
+    ],
+  },
+  {
+    id: 'microprocessors',
+    name: 'Microprocessors & Microcontrollers',
+    color: '#10b981',
+    topics: [
+      '8085 Architecture & Instruction Set',
+      '8051 Microcontroller',
+      'Memory Interfacing',
+      'I/O Port Programming',
+      'Interrupts & DMA',
+      'ARM Architecture Overview',
+    ],
+  },
+  {
+    id: 'signals-systems',
+    name: 'Signals & Systems',
+    color: '#f59e0b',
+    topics: [
+      'Continuous & Discrete Signals',
+      'Fourier Series & Transform',
+      'Laplace Transform',
+      'Z-Transform',
+      'Sampling & Reconstruction',
+      'Convolution & Correlation',
+    ],
+  },
+  {
+    id: 'circuit-theory',
+    name: 'Circuit Theory',
+    color: '#ef4444',
+    topics: [
+      'Network Theorems (Thevenin, Norton)',
+      'Resonance Circuits',
+      'Two-Port Networks',
+      'Transient Analysis',
+      'AC Circuit Analysis',
+      'Graph Theory in Networks',
+    ],
+  },
+  {
+    id: 'analog-electronics',
+    name: 'Analog Electronics',
+    color: '#06b6d4',
+    topics: [
+      'Diode Circuits & Applications',
+      'BJT Amplifiers',
+      'FET & MOSFET Circuits',
+      'Operational Amplifiers',
+      'Oscillators & Feedback',
+      'Power Amplifiers',
+    ],
+  },
+  {
+    id: 'digital-electronics',
+    name: 'Digital Electronics',
+    color: '#84cc16',
+    topics: [
+      'Boolean Algebra & Minimization',
+      'Combinational Circuits',
+      'Sequential Circuits (Flip-Flops, Counters)',
+      'ADC & DAC Converters',
+      'Memory Devices',
+      'Programmable Logic Devices',
+    ],
+  },
+];
+
+export const STUDY_HOURS_DATA = [
+  { day: 'Mon', hours: 3.5, target: 4 },
+  { day: 'Tue', hours: 5.0, target: 4 },
+  { day: 'Wed', hours: 2.0, target: 4 },
+  { day: 'Thu', hours: 6.5, target: 5 },
+  { day: 'Fri', hours: 4.0, target: 4 },
+  { day: 'Sat', hours: 7.5, target: 6 },
+  { day: 'Sun', hours: 5.0, target: 6 },
+  { day: 'Mon', hours: 4.5, target: 4 },
+  { day: 'Tue', hours: 6.0, target: 5 },
+  { day: 'Wed', hours: 3.0, target: 4 },
+  { day: 'Thu', hours: 5.5, target: 5 },
+  { day: 'Fri', hours: 7.0, target: 6 },
+  { day: 'Sat', hours: 8.0, target: 7 },
+  { day: 'Sun', hours: 6.5, target: 6 },
+];
+
+export const MOTIVATIONAL_QUOTES = [
+  { quote: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { quote: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+  { quote: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  { quote: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
+  { quote: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+  { quote: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { quote: "The expert in anything was once a beginner.", author: "Helen Hayes" },
+  { quote: "A year from now you may wish you had started today.", author: "Karen Lamb" },
+];
+
+export const DAILY_TASKS_INITIAL = [
+  { id: 1, text: 'Revise Transmission Line parameters (Chapter 4)', done: false },
+  { id: 2, text: 'Solve 10 problems on Induction Motor speed-torque curves', done: false },
+  { id: 3, text: 'Watch lecture on Root Locus technique', done: true },
+  { id: 4, text: 'Complete PYQs: Signals & Systems 2022 paper', done: false },
+  { id: 5, text: 'Make flashcards for 8085 instruction set', done: false },
+  { id: 6, text: 'Mock test: Circuit Theory (30 mins)', done: true },
+];

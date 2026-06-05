@@ -1,0 +1,315 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ecf0f3;
+  --bg-light: #ecf0f3;
+  --bg-lighter: #f6f8f9;
+  --nm-shadow-dark: #c5d1de;
+  --nm-shadow-light: #ffffff;
+  --nm-border: rgba(255, 255, 255, 0.5);
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+
+  color-scheme: light;
+
+  --color-cyan: #0ea5e9;
+  --color-purple: #8b5cf6;
+  --color-pink: #ec4899;
+  --color-emerald: #10b981;
+  --color-amber: #f59e0b;
+  --accent: var(--color-cyan);
+}
+
+[data-theme='dark'] {
+  --bg: #12121a;
+  --bg-light: #1a1a24;
+  --bg-lighter: #1e1e2e;
+  --nm-shadow-dark: #0a0a10;
+  --nm-shadow-light: #1c1c2c;
+  --nm-border: rgba(150, 150, 150, 0.05);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+
+  color-scheme: dark;
+
+  --color-cyan: #00f5ff;
+  --color-purple: #a78bfa;
+  --color-pink: #f472b6;
+  --color-emerald: #34d399;
+  --color-amber: #fbbf24;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* ===== NEOMORPHISM UTILITIES ===== */
+.nm-raised {
+  background: var(--bg);
+  box-shadow: 
+    6px 6px 14px var(--nm-shadow-dark),
+    -4px -4px 10px var(--nm-shadow-light);
+  border-radius: 16px;
+}
+
+.nm-inset {
+  background: var(--bg);
+  box-shadow: 
+    inset 4px 4px 10px var(--nm-shadow-dark),
+    inset -3px -3px 8px var(--nm-shadow-light);
+  border-radius: 12px;
+}
+
+.nm-card {
+  background: var(--bg-light);
+  box-shadow: 
+    8px 8px 20px var(--nm-shadow-dark),
+    -5px -5px 14px var(--nm-shadow-light);
+  border-radius: 20px;
+  border: 1px solid var(--nm-border);
+}
+
+.nm-btn {
+  background: var(--bg);
+  box-shadow: 
+    5px 5px 12px var(--nm-shadow-dark),
+    -3px -3px 8px var(--nm-shadow-light);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.nm-btn:hover {
+  box-shadow: 
+    7px 7px 16px var(--nm-shadow-dark),
+    -4px -4px 10px var(--nm-shadow-light);
+  transform: translateY(-1px);
+}
+
+.nm-btn:active {
+  box-shadow: 
+    inset 3px 3px 8px var(--nm-shadow-dark),
+    inset -2px -2px 6px var(--nm-shadow-light);
+  transform: translateY(0);
+}
+
+.nm-btn-accent {
+  background: var(--accent);
+  box-shadow: 
+    5px 5px 15px color-mix(in srgb, var(--accent) 30%, transparent),
+    -2px -2px 8px color-mix(in srgb, var(--accent) 10%, transparent);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .nm-btn-accent {
+  color: #0a0a10;
+}
+
+.nm-btn-accent:hover {
+  box-shadow: 
+    7px 7px 20px color-mix(in srgb, var(--accent) 40%, transparent),
+    -3px -3px 10px color-mix(in srgb, var(--accent) 15%, transparent);
+  transform: translateY(-2px);
+}
+
+.nm-btn-violet {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  box-shadow: 
+    5px 5px 15px rgba(139, 92, 246, 0.25),
+    -2px -2px 8px rgba(139, 92, 246, 0.1);
+  color: white;
+  font-weight: 600;
+}
+
+.nm-btn-violet:hover {
+  box-shadow: 
+    7px 7px 20px rgba(139, 92, 246, 0.4),
+    0 0 30px rgba(139, 92, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ===== GLOW EFFECTS ===== */
+.glow-accent {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent), 0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.glow-violet {
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.4);
+}
+
+.border-glow-accent {
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 15%, transparent), inset 0 0 10px color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.border-glow-violet {
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.15), inset 0 0 10px rgba(139, 92, 246, 0.05);
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-track {
+  background: var(--bg);
+  box-shadow: inset 3px 3px 8px var(--nm-shadow-dark), inset -2px -2px 6px var(--nm-shadow-light);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill-accent {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, transparent), var(--accent), color-mix(in srgb, var(--accent) 70%, transparent));
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+  border-radius: 999px;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ===== CHECKBOX ===== */
+.neo-checkbox {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: inset 2px 2px 5px var(--nm-shadow-dark), inset -1px -1px 4px var(--nm-shadow-light);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.neo-checkbox:checked {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 80%, transparent), var(--accent));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 50%, transparent), inset 0 0 3px rgba(255,255,255,0.2);
+}
+
+.neo-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+[data-theme="dark"] .neo-checkbox:checked::after {
+  color: #0a0a10;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a3e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slide-down { animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+.stagger-5 { animation-delay: 0.25s; }
+
+@keyframes pulse-accent {
+  0%, 100% { box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 20%, transparent); }
+  50% { box-shadow: 0 0 25px color-mix(in srgb, var(--accent) 50%, transparent), inset 0 0 10px color-mix(in srgb, var(--accent) 20%, transparent); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+.animate-pulse-accent { animation: pulse-accent 2s ease-in-out infinite; }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* ===== MODAL ===== */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+/* ===== CLOCK ===== */
+.digital-clock {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== DRAG OVER ===== */
+.dropzone-active {
+  border-color: rgba(0, 245, 255, 0.6) !important;
+  box-shadow: 0 0 30px rgba(0, 245, 255, 0.2) !important;
+  background: rgba(0, 245, 255, 0.03) !important;
+}
+
+/* ===== RADAR CHART CUSTOMIZATION ===== */
+.recharts-polar-angle-axis-tick-value {
+  fill: #94a3b8 !important;
+  font-size: 11px !important;
+}
