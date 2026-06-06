@@ -19,6 +19,10 @@ import {
 import { STUDY_HOURS_DATA, MOTIVATIONAL_QUOTES, DAILY_TASKS_INITIAL } from './data/sampleData';
 import { parseSyllabusPDF } from './utils/pdfParser';
 import React from 'react';
+import { AuthProvider, useAuth } from './AuthContext';
+import { db } from './firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import Login from './Login';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -993,6 +997,7 @@ function ThemeToggle({ theme, setTheme }) {
 
 // ─── Settings Sidebar ─────────────────────────────────────────────────────────
 function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor }) {
+  const { currentUser, logout } = useAuth();
   return (
     <>
       <div className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={onClose} />
@@ -1031,6 +1036,24 @@ function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor }) {
                 );
               })}
             </div>
+          </div>
+
+          <div className="mt-auto border-t border-[var(--nm-border)] pt-6 flex flex-col gap-4">
+            <label className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-widest">Account</label>
+            {currentUser ? (
+              <div className="flex flex-col gap-3">
+                <div className="text-xs text-[var(--text-primary)] px-2 py-1 bg-[var(--nm-inset)] rounded-md border border-[var(--nm-border)] text-center break-all">
+                  {currentUser.email}
+                </div>
+                <button onClick={logout} className="nm-btn p-2.5 rounded-xl text-xs font-bold text-red-400 hover:text-red-500 transition-colors w-full flex justify-center">
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="text-xs text-[var(--text-muted)] text-center px-4">
+                You are currently using StudyDash as a Guest. Log in to sync your data.
+              </div>
+            )}
           </div>
 
         </div>
@@ -1380,7 +1403,10 @@ function HomePage({ dashboards, onOpen, onDelete, onCreateNew, onOpenSettings, t
 }
 
 // ─── App Root ─────────────────────────────────────────────────────────────────
-export default function App() {
+function MainApp() {
+  const { currentUser, logout } = useAuth();
+  const [guestMode, setGuestMode] = useState(false);
+
   const [view,            setView]            = useState('home');
   const [showSettings,    setShowSettings]    = useState(false);
   
@@ -1397,19 +1423,60 @@ export default function App() {
     document.documentElement.style.setProperty('--accent', accentColor);
   }, [accentColor]);
 
-  const [dashboards,      setDashboards]      = useState(() => {
-    try {
-      const saved = localStorage.getItem('studydash_db');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error('Failed to load from localStorage', e);
-    }
-    return [];
-  });
+  const [dashboards, setDashboards] = useState([]);
+  const [dashboardsLoaded, setDashboardsLoaded] = useState(false);
 
   useEffect(() => {
+    async function loadData() {
+      let localData = [];
+      try {
+        const saved = localStorage.getItem('studydash_db');
+        if (saved) localData = JSON.parse(saved);
+      } catch (e) { }
+
+      if (currentUser) {
+        try {
+          const docRef = doc(db, 'users', currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const cloudData = docSnap.data().dashboards || [];
+            const mergedData = [...cloudData];
+            let needsUpdate = false;
+            localData.forEach(ld => {
+              if (!mergedData.find(cd => cd.id === ld.id)) {
+                mergedData.push(ld);
+                needsUpdate = true;
+              }
+            });
+            
+            if (needsUpdate) {
+              await setDoc(docRef, { dashboards: mergedData }, { merge: true });
+            }
+            setDashboards(mergedData);
+          } else {
+            await setDoc(docRef, { dashboards: localData }, { merge: true });
+            setDashboards(localData);
+          }
+        } catch (err) {
+          console.error("Failed to load cloud data", err);
+          setDashboards(localData);
+        }
+      } else {
+        setDashboards(localData);
+      }
+      setDashboardsLoaded(true);
+    }
+    loadData();
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!dashboardsLoaded) return;
     localStorage.setItem('studydash_db', JSON.stringify(dashboards));
-  }, [dashboards]);
+    if (currentUser) {
+      const docRef = doc(db, 'users', currentUser.uid);
+      setDoc(docRef, { dashboards }, { merge: true }).catch(err => console.error("Cloud save failed", err));
+    }
+  }, [dashboards, currentUser, dashboardsLoaded]);
   const [activeDashId,    setActiveDashId]    = useState(null);
   const [pendingFile,     setPendingFile]     = useState(null);
   const [pendingDate,     setPendingDate]     = useState(null);
@@ -1449,6 +1516,10 @@ export default function App() {
   const handleUpdate = (id, updates) => setDashboards(prev => prev.map(d => d.id===id?{...d,...updates}:d));
   const handleDelete = id => { setDashboards(prev => prev.filter(d => d.id!==id)); setActiveDashId(null); setView('home'); };
   const activeDash = dashboards.find(d => d.id===activeDashId);
+
+  if (!currentUser && !guestMode) {
+    return <Login onGuest={() => setGuestMode(true)} />;
+  }
 
   return (
     <>
@@ -1494,5 +1565,13 @@ export default function App() {
       <SettingsSidebar isOpen={showSettings} onClose={() => setShowSettings(false)} 
         accentColor={accentColor} setAccentColor={setAccentColor} />
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }
