@@ -27,7 +27,8 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    localStorage.removeItem('studydash_db');
+    localStorage.removeItem('sempilot_db');
+    localStorage.removeItem('studydash_db'); // Legacy support
     return signOut(auth);
   }
 

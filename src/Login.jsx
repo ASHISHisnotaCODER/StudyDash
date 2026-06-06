@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Mail, Lock, LogIn, UserPlus, ArrowRight, GraduationCap, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, ArrowRight, GraduationCap, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function Login({ onGuest }) {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -9,6 +9,7 @@ export default function Login({ onGuest }) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login, signup, resetPassword } = useAuth();
 
   async function handleResetPassword(e) {
@@ -54,25 +55,39 @@ export default function Login({ onGuest }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
+    <div className="min-h-screen flex flex-col p-4 sm:p-8"
          style={{background:'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, var(--bg) 60%)'}}>
       
-      <div className="nm-card w-full max-w-md p-8 flex flex-col gap-6 animate-fade-in relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent)] opacity-5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"/>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#8b5cf6] opacity-5 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"/>
-
-        <div className="flex flex-col items-center text-center gap-2 mb-2 relative z-10">
-          <div className="w-14 h-14 nm-card flex items-center justify-center border-glow-accent mb-2">
-            <GraduationCap size={24} className="text-[var(--accent)]"/>
+      {/* NavBar */}
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between nm-card p-3 sm:px-6 rounded-2xl mb-8 sm:mb-16">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 nm-card flex items-center justify-center border-glow-accent">
+            <GraduationCap size={18} className="text-[var(--accent)]"/>
           </div>
-          <h1 className="text-2xl font-black text-[var(--text-primary)]">
-            Study<span className="text-[var(--accent)] glow-accent">Dash</span>
+          <h1 className="text-xl font-black text-[var(--text-primary)]">
+            Sem<span className="text-[var(--accent)] glow-accent">Pilot</span>
           </h1>
-          <p className="text-[var(--text-muted)] text-xs">
-            {isSignUp ? 'Create an account to sync across devices' : 'Sign in to access your cloud dashboards'}
-          </p>
         </div>
+        <button onClick={onGuest} className="text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors flex items-center gap-2">
+          Guest Mode <ArrowRight size={14}/>
+        </button>
+      </div>
+
+      {/* Login Card */}
+      <div className="flex-1 flex items-start justify-center mt-4 sm:mt-8">
+        <div className="nm-card w-full max-w-sm p-6 sm:p-8 flex flex-col gap-6 animate-fade-in relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent)] opacity-5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"/>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#8b5cf6] opacity-5 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"/>
+
+          <div className="flex flex-col items-center text-center gap-1 mb-2 relative z-10">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
+            </h2>
+            <p className="text-[var(--text-muted)] text-[11px] sm:text-xs px-2">
+              {isSignUp ? 'Sign up to securely sync your dashboards' : 'Sign in to access your cloud dashboards'}
+            </p>
+          </div>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs px-4 py-3 rounded-xl flex items-start gap-2 animate-fade-in relative z-10">
@@ -118,13 +133,20 @@ export default function Login({ onGuest }) {
             <div className="relative flex items-center">
               <Lock size={16} className="absolute left-3 text-[var(--text-muted)]" />
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"}
                 required 
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full bg-[var(--bg)] border border-[var(--nm-border)] rounded-xl py-2.5 pl-10 pr-4 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] transition-colors shadow-inner"
+                className="w-full bg-[var(--bg)] border border-[var(--nm-border)] rounded-xl py-2.5 pl-10 pr-10 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] transition-colors shadow-inner"
                 placeholder="••••••••"
               />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] focus:outline-none transition-colors"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 
@@ -138,26 +160,15 @@ export default function Login({ onGuest }) {
           </button>
         </form>
 
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="h-px bg-[var(--nm-border)] flex-1"/>
-          <span className="text-[10px] text-[var(--text-muted)] font-medium uppercase tracking-wider">OR</span>
-          <div className="h-px bg-[var(--nm-border)] flex-1"/>
-        </div>
-
-        <button 
-          onClick={onGuest}
-          className="nm-btn w-full py-2.5 rounded-xl text-xs font-semibold text-[var(--text-secondary)] flex items-center justify-center gap-2 hover:text-[var(--text-primary)] transition-colors relative z-10"
-        >
-          Continue as Guest <ArrowRight size={14}/>
-        </button>
-
-        <div className="text-center mt-2 relative z-10">
-          <button 
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors font-medium"
-          >
-            {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
-          </button>
+          <div className="text-center mt-2 relative z-10">
+            <button 
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors font-medium"
+            >
+              {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

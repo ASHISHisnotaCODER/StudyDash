@@ -80,5 +80,5 @@ ${text.substring(0, 100000)}`;
 });
 
 app.listen(PORT, () => {
-  console.log(`StudyDash Backend running on http://localhost:${PORT}`);
+  console.log(`SemPilot Backend running on http://localhost:${PORT}`);
 });

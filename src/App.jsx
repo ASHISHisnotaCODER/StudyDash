@@ -492,7 +492,7 @@ function CelebrationModal({ hours, onClose }) {
         </p>
 
         <button onClick={() => {
-            alert(`Shared: "I just unlocked the ${medal.name} badge with ${hours} hours of deep study on StudyDash!"`);
+            alert(`Shared: "I just unlocked the ${medal.name} badge with ${hours} hours of deep study on SemPilot!"`);
             onClose();
           }} 
           className="w-full bg-[#ff5a5f] hover:bg-[#e0484d] text-white py-3.5 rounded-[1rem] font-bold text-sm shadow-[0_8px_20px_rgba(255,90,95,0.3)] transition-transform hover:scale-[1.02] active:scale-95">
@@ -797,7 +797,7 @@ function UploadScreen({ onParsed }) {
           <div className="w-10 h-10 nm-card flex items-center justify-center border-glow-accent">
             <GraduationCap size={20} className="text-[var(--accent)]"/>
           </div>
-          <h1 className="text-4xl font-black text-[var(--text-primary)] tracking-tight">Study<span className="text-[var(--accent)] glow-accent">Dash</span></h1>
+          <h1 className="text-4xl font-black text-[var(--text-primary)] tracking-tight">Sem<span className="text-[var(--accent)] glow-accent">Pilot</span></h1>
         </div>
         <p className="text-[var(--text-muted)] text-sm">Your personalized exam preparation command center</p>
       </div>
@@ -996,7 +996,7 @@ function ThemeToggle({ theme, setTheme }) {
 }
 
 // ─── Settings Sidebar ─────────────────────────────────────────────────────────
-function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor }) {
+function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor, onLoginClick }) {
   const { currentUser, logout } = useAuth();
   return (
     <>
@@ -1050,8 +1050,13 @@ function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor }) {
                 </button>
               </div>
             ) : (
-              <div className="text-xs text-[var(--text-muted)] text-center px-4">
-                You are currently using StudyDash as a Guest. Log in to sync your data.
+              <div className="flex flex-col gap-3 px-4">
+                <div className="text-xs text-[var(--text-muted)] text-center">
+                  You are currently using SemPilot as a Guest. Log in to sync your data.
+                </div>
+                <button onClick={onLoginClick} className="nm-btn p-2.5 rounded-xl text-xs font-bold text-[var(--accent)] hover:text-white transition-colors w-full flex justify-center">
+                  Log In or Sign Up
+                </button>
               </div>
             )}
           </div>
@@ -1081,7 +1086,7 @@ function DashboardHeader({ title, onBack, onSave, onShare, onDownload, onDelete,
               <GraduationCap size={13} className="text-[var(--accent)]"/>
             </div>
             <div>
-              <div className="text-xs font-bold text-[var(--text-primary)]">StudyDash</div>
+              <div className="text-xs font-bold text-[var(--text-primary)]">SemPilot</div>
               <div className="text-[9px] text-[var(--text-muted)] max-w-[120px] sm:max-w-[150px] truncate">{title}</div>
             </div>
           </div>
@@ -1289,7 +1294,7 @@ function HomePage({ dashboards, onOpen, onDelete, onCreateNew, onOpenSettings, t
               <GraduationCap size={16} className="text-[var(--accent)]"/>
             </div>
             <div>
-              <div className="text-base font-black text-[var(--text-primary)]">Study<span className="text-[var(--accent)] glow-accent">Dash</span></div>
+              <div className="text-base font-black text-[var(--text-primary)]">Sem<span className="text-[var(--accent)] glow-accent">Pilot</span></div>
               <div className="text-[9px] text-[var(--text-muted)]">Exam Preparation Hub</div>
             </div>
           </div>
@@ -1410,16 +1415,16 @@ function MainApp() {
   const [view,            setView]            = useState('home');
   const [showSettings,    setShowSettings]    = useState(false);
   
-  const [theme, setTheme] = useState(() => localStorage.getItem('studydash_theme') || 'dark');
-  const [accentColor, setAccentColor] = useState(() => localStorage.getItem('studydash_accent') || 'var(--color-cyan)');
+  const [theme, setTheme] = useState(() => localStorage.getItem('sempilot_theme') || localStorage.getItem('studydash_theme') || 'dark');
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem('sempilot_accent') || localStorage.getItem('studydash_accent') || 'var(--color-cyan)');
 
   useEffect(() => {
-    localStorage.setItem('studydash_theme', theme);
+    localStorage.setItem('sempilot_theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   useEffect(() => {
-    localStorage.setItem('studydash_accent', accentColor);
+    localStorage.setItem('sempilot_accent', accentColor);
     document.documentElement.style.setProperty('--accent', accentColor);
   }, [accentColor]);
 
@@ -1430,7 +1435,7 @@ function MainApp() {
     async function loadData() {
       let localData = [];
       try {
-        const saved = localStorage.getItem('studydash_db');
+        const saved = localStorage.getItem('sempilot_db') || localStorage.getItem('studydash_db');
         if (saved) localData = JSON.parse(saved);
       } catch (e) { }
 
@@ -1471,12 +1476,13 @@ function MainApp() {
 
   useEffect(() => {
     if (!dashboardsLoaded) return;
-    localStorage.setItem('studydash_db', JSON.stringify(dashboards));
+    localStorage.setItem('sempilot_db', JSON.stringify(dashboards));
     if (currentUser) {
       const docRef = doc(db, 'users', currentUser.uid);
       setDoc(docRef, { dashboards }, { merge: true }).catch(err => console.error("Cloud save failed", err));
     }
-  }, [dashboards, currentUser, dashboardsLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dashboards]);
   const [activeDashId,    setActiveDashId]    = useState(null);
   const [pendingFile,     setPendingFile]     = useState(null);
   const [pendingDate,     setPendingDate]     = useState(null);
@@ -1563,7 +1569,8 @@ function MainApp() {
       )}
       
       <SettingsSidebar isOpen={showSettings} onClose={() => setShowSettings(false)} 
-        accentColor={accentColor} setAccentColor={setAccentColor} />
+        accentColor={accentColor} setAccentColor={setAccentColor} 
+        onLoginClick={() => { setShowSettings(false); setGuestMode(false); }} />
     </>
   );
 }
