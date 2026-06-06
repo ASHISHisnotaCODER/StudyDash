@@ -517,27 +517,52 @@ function CelebrationModal({ hours, onClose }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ─── STUDY TIMER (Floating) ───────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════════════════
+// ─── Global Timer State ────────────────────────────────────────────────────────
+const globalTimerState = {
+  isRunning: false,
+  startRef: null,
+  elapsedWhenPaused: 0
+};
+
 function StudyTimer({ sessions, setSessions }) {
-  const [isRunning,setIsRunning]=useState(false);
-  const [elapsed,setElapsed]=useState(0);
-  const [expanded,setExpanded]=useState(false);
-  const startRef=useRef(null);
-  const timerRef=useRef(null);
-
-  useEffect(()=>{
-    if(isRunning){
-      startRef.current=Date.now()-elapsed*1000;
-      timerRef.current=setInterval(()=>setElapsed(Math.floor((Date.now()-startRef.current)/1000)),1000);
-    } else clearInterval(timerRef.current);
-    return ()=>clearInterval(timerRef.current);
-  },[isRunning]);
-
-  const handleStop=()=>{
-    if(elapsed>5){
-      const now=Date.now();
-      setSessions(prev=>[{id:now,start:new Date(now-elapsed*1000).toISOString(),end:new Date(now).toISOString(),duration:elapsed},...prev]);
+  const [isRunning, setIsRunning] = useState(globalTimerState.isRunning);
+  const [elapsed, setElapsed] = useState(() => {
+    if (globalTimerState.isRunning && globalTimerState.startRef) {
+      return Math.floor((Date.now() - globalTimerState.startRef) / 1000);
     }
-    setIsRunning(false); setElapsed(0);
+    return globalTimerState.elapsedWhenPaused;
+  });
+  const [expanded, setExpanded] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (isRunning) {
+      if (!globalTimerState.startRef) {
+        globalTimerState.startRef = Date.now() - elapsed * 1000;
+      }
+      globalTimerState.isRunning = true;
+      timerRef.current = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - globalTimerState.startRef) / 1000));
+      }, 1000);
+    } else {
+      globalTimerState.isRunning = false;
+      globalTimerState.elapsedWhenPaused = elapsed;
+      globalTimerState.startRef = null;
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isRunning, elapsed]);
+
+  const handleStop = () => {
+    if (elapsed > 5) {
+      const now = Date.now();
+      setSessions(prev => [{id: now, start: new Date(now - elapsed * 1000).toISOString(), end: new Date(now).toISOString(), duration: elapsed}, ...prev]);
+    }
+    globalTimerState.isRunning = false;
+    globalTimerState.startRef = null;
+    globalTimerState.elapsedWhenPaused = 0;
+    setIsRunning(false); 
+    setElapsed(0);
   };
 
   const totalToday=sessions
@@ -585,7 +610,13 @@ function StudyTimer({ sessions, setSessions }) {
             </button>
             {elapsed>0&&<>
               <button onClick={handleStop} className="nm-btn py-2.5 px-3 rounded-xl text-[var(--text-secondary)] hover:text-[#10b981] transition-colors" title="Save session"><Square size={14}/></button>
-              <button onClick={()=>{setIsRunning(false);setElapsed(0);}} className="nm-btn py-2.5 px-3 rounded-xl text-[var(--text-secondary)] hover:text-[#ef4444] transition-colors" title="Reset"><RotateCcw size={13}/></button>
+              <button onClick={()=>{
+                  globalTimerState.isRunning=false; 
+                  globalTimerState.startRef=null; 
+                  globalTimerState.elapsedWhenPaused=0; 
+                  setIsRunning(false); 
+                  setElapsed(0);
+                }} className="nm-btn py-2.5 px-3 rounded-xl text-[var(--text-secondary)] hover:text-[#ef4444] transition-colors" title="Reset"><RotateCcw size={13}/></button>
             </>}
           </div>
           <div className="mx-4 mb-4 nm-inset px-3 py-2.5 flex items-center justify-between">
