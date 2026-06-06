@@ -9,7 +9,7 @@ import {
   CheckCheck, Loader2, Sparkles, ChevronRight,
   GraduationCap, TrendingUp, Play, Pause, Square,
   Timer, RotateCcw, MapPin, Flag, Layers, Rocket,
-  BookMarked, FlaskConical, ClipboardList, AlertCircle, Settings, Crown, RefreshCw
+  BookMarked, FlaskConical, ClipboardList, AlertCircle, Settings, Crown, RefreshCw, Menu
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -414,7 +414,7 @@ function WeeklyBadgesWidget({ sessions }) {
   const weekLabel = weekOffset === 0 ? "This Week" : weekOffset === -1 ? "Last Week" : `${Math.abs(weekOffset)} Weeks Ago`;
 
   return (
-    <div className="nm-card p-4 flex flex-col gap-2 lg:col-span-2">
+    <div className="nm-card p-4 flex flex-col gap-2 col-span-1 md:col-span-2 lg:col-span-2 overflow-hidden">
       <div className="flex items-center justify-between mb-1">
         <div className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-semibold flex items-center gap-1.5"><Crown size={12} className="text-[#fbbf24]" fill="currentColor"/> Weekly Badges</div>
         <div className="flex items-center gap-2">
@@ -423,7 +423,7 @@ function WeeklyBadgesWidget({ sessions }) {
           <button onClick={() => setWeekOffset(w => w < 0 ? w + 1 : 0)} disabled={weekOffset === 0} className={`p-1 nm-inset rounded-md transition-colors ${weekOffset === 0 ? 'text-[var(--text-muted)] opacity-50 cursor-not-allowed' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}><ChevronRight size={10}/></button>
         </div>
       </div>
-      <div className="flex items-center justify-between px-2 py-1 flex-1">
+      <div className="flex items-center justify-between px-1 py-1 flex-1 overflow-x-auto min-w-0 pb-2" style={{scrollbarWidth: 'none'}}>
         {days.map((date, i) => {
           const totalSecs = (sessions || []).filter(s => isSameDay(new Date(s.start), date)).reduce((a, s) => a + s.duration, 0);
           const hrs = totalSecs / 3600;
@@ -1041,42 +1041,63 @@ function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor }) {
 
 // ─── Dashboard Header ─────────────────────────────────────────────────────────
 function DashboardHeader({ title, onBack, onSave, onShare, onDownload, onDelete, onOpenSettings, theme, setTheme }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="nm-card p-3 flex items-center gap-3 flex-wrap">
-      <button onClick={onBack} id="btn-home"
-        className="nm-btn p-2.5 rounded-xl flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors flex-shrink-0">
-        <Home size={14}/><span className="text-xs font-medium hidden sm:inline">Home</span>
-      </button>
-      <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block"/>
-      <div className="flex items-center gap-2.5 mr-auto">
-        <div className="w-7 h-7 nm-card flex items-center justify-center border-glow-accent flex-shrink-0">
-          <GraduationCap size={13} className="text-[var(--accent)]"/>
-        </div>
-        <div>
-          <div className="text-xs font-bold text-[var(--text-primary)]">StudyDash</div>
-          <div className="text-[9px] text-[var(--text-muted)] max-w-[150px] truncate">{title}</div>
-        </div>
-      </div>
-      <DigitalClock/>
-      <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
-      <ThemeToggle theme={theme} setTheme={setTheme} />
-      <button onClick={onOpenSettings} className="nm-btn p-2.5 rounded-xl text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
-        <Settings size={15}/>
-      </button>
-      <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
-      <div className="flex items-center gap-1.5">
-        {[
-          {id:'btn-save',    title:'Save',        icon:Save,     action:onSave,     hover:'var(--accent)'},
-          {id:'btn-share',   title:'Share',        icon:Share2,   action:onShare,    hover:'var(--accent)'},
-          {id:'btn-download',title:'Download PDF', icon:Download, action:onDownload, hover:'#10b981'},
-          {id:'btn-delete',  title:'Delete',       icon:Trash2,   action:onDelete,   hover:'#ef4444'},
-        ].map(({id,title,icon:Icon,action,hover})=>(
-          <button key={id} id={id} onClick={action} title={title} className="nm-btn p-2 rounded-xl group"
-            onMouseEnter={e=>e.currentTarget.querySelector('svg').style.color=hover}
-            onMouseLeave={e=>e.currentTarget.querySelector('svg').style.color=''}>
-            <Icon size={13} className="text-[var(--text-secondary)] transition-colors"/>
+    <div className="nm-card p-3 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 relative">
+      {/* Left Group */}
+      <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} id="btn-home"
+            className="nm-btn p-2.5 rounded-xl flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors flex-shrink-0">
+            <Home size={14}/>
           </button>
-        ))}
+          <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block"/>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 nm-card flex items-center justify-center border-glow-accent flex-shrink-0">
+              <GraduationCap size={13} className="text-[var(--accent)]"/>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-[var(--text-primary)]">StudyDash</div>
+              <div className="text-[9px] text-[var(--text-muted)] max-w-[120px] sm:max-w-[150px] truncate">{title}</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile Hamburger Button */}
+        <button className="sm:hidden nm-btn p-2 rounded-xl text-[var(--text-secondary)]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          {isMenuOpen ? <X size={16}/> : <Menu size={16}/>}
+        </button>
+      </div>
+
+      {/* Right Group */}
+      <div className={`${isMenuOpen ? 'flex' : 'hidden'} sm:flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-3 sm:gap-2 w-full sm:w-auto`}>
+        <div className="hidden sm:block"><DigitalClock/></div>
+        <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
+        
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
+          <ThemeToggle theme={theme} setTheme={setTheme} />
+          <button onClick={onOpenSettings} className="nm-btn p-2.5 rounded-xl text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+            <Settings size={15}/>
+          </button>
+        </div>
+
+        <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
+        
+        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0">
+          {[
+            {id:'btn-save',    title:'Save',        icon:Save,     action:onSave,     hover:'var(--accent)'},
+            {id:'btn-share',   title:'Share',        icon:Share2,   action:onShare,    hover:'var(--accent)'},
+            {id:'btn-download',title:'Download PDF', icon:Download, action:onDownload, hover:'#10b981'},
+            {id:'btn-delete',  title:'Delete',       icon:Trash2,   action:onDelete,   hover:'#ef4444'},
+          ].map(({id,title,icon:Icon,action,hover})=>(
+            <button key={id} id={id} onClick={action} title={title} className="nm-btn p-2 rounded-xl group flex-1 sm:flex-none flex justify-center"
+              onMouseEnter={e=>e.currentTarget.querySelector('svg').style.color=hover}
+              onMouseLeave={e=>e.currentTarget.querySelector('svg').style.color=''}>
+              <Icon size={13} className="text-[var(--text-secondary)] transition-colors"/>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -1158,7 +1179,7 @@ function Dashboard({ db, onUpdate, onBack, onDelete, onOpenSettings, theme, setT
       )}
 
       {/* Row 1 — Key Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
         <WeeklyBadgesWidget sessions={sessions} />
         <CountdownWidget examDate={examDate}/>
         <div className="nm-card p-5 flex flex-col items-center justify-center gap-2 text-center">
@@ -1231,30 +1252,46 @@ function Dashboard({ db, onUpdate, onBack, onDelete, onOpenSettings, theme, setT
 
 // ─── Home Page ────────────────────────────────────────────────────────────────
 function HomePage({ dashboards, onOpen, onDelete, onCreateNew, onOpenSettings, theme, setTheme }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const fmt=d=>new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
   return (
-    <div className="min-h-screen p-5 flex flex-col gap-5"
+    <div className="min-h-screen p-3 sm:p-5 flex flex-col gap-4 sm:gap-5"
       style={{background:'radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, var(--bg) 55%)'}}>
-      <div className="nm-card p-4 flex items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 nm-card flex items-center justify-center border-glow-accent">
-            <GraduationCap size={16} className="text-[var(--accent)]"/>
+      <div className="nm-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        {/* Top Bar on Mobile */}
+        <div className="flex items-center justify-between w-full sm:w-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 nm-card flex items-center justify-center border-glow-accent">
+              <GraduationCap size={16} className="text-[var(--accent)]"/>
+            </div>
+            <div>
+              <div className="text-base font-black text-[var(--text-primary)]">Study<span className="text-[var(--accent)] glow-accent">Dash</span></div>
+              <div className="text-[9px] text-[var(--text-muted)]">Exam Preparation Hub</div>
+            </div>
           </div>
-          <div>
-            <div className="text-base font-black text-[var(--text-primary)]">Study<span className="text-[var(--accent)] glow-accent">Dash</span></div>
-            <div className="text-[9px] text-[var(--text-muted)]">Exam Preparation Hub</div>
-          </div>
-        </div>
-        <div className="ml-auto flex items-center gap-3 flex-wrap">
-          <DigitalClock/>
-          <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
-          <ThemeToggle theme={theme} setTheme={setTheme} />
-          <button onClick={onOpenSettings} className="nm-btn p-2.5 rounded-xl text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
-            <Settings size={15}/>
+          
+          {/* Mobile Hamburger Button */}
+          <button className="sm:hidden nm-btn p-2 rounded-xl text-[var(--text-secondary)]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X size={18}/> : <Menu size={18}/>}
           </button>
+        </div>
+        
+        {/* Expandable Menu */}
+        <div className={`${isMenuOpen ? 'flex' : 'hidden'} sm:flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-4 sm:gap-3 w-full sm:w-auto`}>
+          <div className="hidden sm:block"><DigitalClock/></div>
           <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
-          <button onClick={onCreateNew} className="nm-btn nm-btn-accent py-2 px-4 rounded-xl text-xs font-bold flex items-center gap-2 ml-2">
-            <PlusCircle size={13}/> New Dashboard
+          
+          <div className="flex items-center gap-4 w-full sm:w-auto justify-center">
+            <ThemeToggle theme={theme} setTheme={setTheme} />
+            <button onClick={onOpenSettings} className="nm-btn p-2.5 rounded-xl text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors">
+              <Settings size={15}/>
+            </button>
+          </div>
+          
+          <div className="w-px h-5 bg-[var(--nm-border)] hidden sm:block mx-1"/>
+          <button onClick={onCreateNew} className="nm-btn nm-btn-accent py-3 sm:py-2 px-4 rounded-xl text-sm sm:text-xs font-bold flex items-center justify-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+            <PlusCircle size={15} className="sm:w-[13px] sm:h-[13px]"/> New Dashboard
           </button>
         </div>
       </div>
