@@ -287,8 +287,22 @@ body {
   to { opacity: 0; transform: translateX(100%); }
 }
 
+@keyframes float-up {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: var(--max-opacity, 0.5); }
+  80% { opacity: var(--max-opacity, 0.5); }
+  100% { transform: translateY(-500px) scale(0.5); opacity: 0; }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.15; }
+  50% { transform: scale(1.1); opacity: 0.25; }
+}
+
 .animate-pulse-accent { animation: pulse-accent 2s ease-in-out infinite; }
 .animate-spin { animation: spin 1s linear infinite; }
+.animate-float { animation: float-up 15s linear infinite; }
+.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
 
 /* ===== MODAL ===== */
 .modal-backdrop {

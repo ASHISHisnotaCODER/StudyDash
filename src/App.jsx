@@ -295,13 +295,24 @@ function StudyHoursChart({ sessions }) {
 }
 
 function ProficiencyRadar({ selectedSubjects, topicChecks }) {
-  const data=selectedSubjects.map(s=>{
+  const data=selectedSubjects.map((s, index)=>{
     const checked=s.topics.filter((_,i)=>topicChecks[`${s.id}-${i}`]).length;
-    return {subject:s.name.split(' ')[0],value:10+Math.round((checked/s.topics.length)*90),fullMark:100};
+    // Try to find the first word that isn't a number or roman numeral, fallback to full name
+    const words = s.name.split(' ').filter(w => w.length > 2 && !/^[0-9.]+$/.test(w));
+    let shortName = words.length > 0 ? words[0] : s.name.split(' ')[0];
+    
+    // If there is a second word, add its first letter to help distinguish (e.g. ELECTRICAL M vs ELECTRICAL H)
+    if (words.length > 1) shortName += ' ' + words[1][0];
+    if (shortName.length > 12) shortName = shortName.substring(0, 12) + '..';
+
+    // Guarantee uniqueness for Recharts so it never merges identical labels into a single web edge
+    shortName += '\u200B'.repeat(index);
+
+    return {subject:shortName.toUpperCase(),value:10+Math.round((checked/s.topics.length)*90),fullMark:100};
   });
   const TT=({active,payload})=>!active||!payload?.length?null:(
-    <div className="nm-card px-3 py-2 text-xs border border-[#8b5cf630]">
-      <div className="text-[#8b5cf6] font-semibold">{payload[0].payload.subject}</div>
+    <div className="nm-card px-3 py-2 text-xs border border-[var(--accent)]">
+      <div className="text-[var(--accent)] font-semibold">{payload[0].payload.subject}</div>
       <div className="text-[var(--text-secondary)]">{payload[0].value}% proficiency</div>
     </div>
   );
@@ -314,9 +325,9 @@ function ProficiencyRadar({ selectedSubjects, topicChecks }) {
       <ResponsiveContainer width="100%" height={190}>
         <RadarChart data={data} margin={{top:5,right:25,bottom:5,left:25}}>
           <PolarGrid stroke="var(--bg-lighter)"/>
-          <PolarAngleAxis dataKey="subject" tick={{fill:'#64748b',fontSize:9}}/>
-          <PolarRadiusAxis tick={{fill:'#334155',fontSize:7}} domain={[0,100]} axisLine={false}/>
-          <Radar name="Proficiency" dataKey="value" stroke="#8b5cf6" strokeWidth={2} fill="#8b5cf6" fillOpacity={0.15} dot={{fill:'#8b5cf6',r:2.5}}/>
+          <PolarAngleAxis dataKey="subject" tick={{fill:'var(--text-secondary)',fontSize:9}} interval={0}/>
+          <PolarRadiusAxis tick={{fill:'var(--text-muted)',fontSize:7}} domain={[0,100]} axisLine={false}/>
+          <Radar name="Proficiency" dataKey="value" stroke="var(--accent)" strokeWidth={2} fill="var(--accent)" fillOpacity={0.15} dot={{fill:'var(--accent)',r:2.5}}/>
           <Tooltip content={<TT/>}/>
         </RadarChart>
       </ResponsiveContainer>
@@ -789,10 +800,11 @@ function UploadScreen({ onParsed }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8"
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-8 relative"
       style={{background:'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 7%, transparent) 0%, var(--bg) 60%)'}}>
+      <ParticleBackground />
 
-      <div className="text-center animate-fade-in">
+      <div className="text-center animate-fade-in relative z-10">
         <div className="flex items-center justify-center gap-3 mb-2">
           <div className="w-10 h-10 nm-card flex items-center justify-center border-glow-accent">
             <GraduationCap size={20} className="text-[var(--accent)]"/>
@@ -802,7 +814,7 @@ function UploadScreen({ onParsed }) {
         <p className="text-[var(--text-muted)] text-sm">Your personalized exam preparation command center</p>
       </div>
 
-      <div className="w-full max-w-lg animate-slide-up">
+      <div className="w-full max-w-lg animate-slide-up relative z-10">
         <div className="nm-card p-7 flex flex-col gap-5">
 
           {/* Parsing Phase */}
@@ -1287,14 +1299,56 @@ function Dashboard({ db, onUpdate, onBack, onDelete, onOpenSettings, theme, setT
   );
 }
 
+// ─── Particle Background ──────────────────────────────────────────────────────
+function ParticleBackground() {
+  const particles = React.useMemo(() => {
+    return Array.from({length: 30}).map((_, i) => ({
+      id: i,
+      size: Math.random() * 4 + 2,
+      left: Math.random() * 100,
+      top: Math.random() * 100 + 10,
+      opacity: Math.random() * 0.4 + 0.1,
+      duration: Math.random() * 20 + 15,
+      delay: Math.random() * -30,
+    }));
+  }, []);
+
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-[0]">
+      <div className="absolute top-[10%] left-[20%] w-64 h-64 rounded-full mix-blend-screen animate-pulse-slow pointer-events-none" 
+           style={{background:'var(--accent)', filter:'blur(120px)', opacity:0.15}}></div>
+      <div className="absolute bottom-[20%] right-[10%] w-96 h-96 rounded-full mix-blend-screen animate-pulse-slow pointer-events-none" 
+           style={{background:'var(--accent)', filter:'blur(150px)', opacity:0.15, animationDelay:'4s'}}></div>
+      
+      {particles.map(p => (
+        <div key={p.id} 
+             className="absolute rounded-full animate-float"
+             style={{
+               width: p.size + 'px',
+               height: p.size + 'px',
+               left: p.left + '%',
+               top: p.top + '%',
+               background: 'var(--accent)',
+               boxShadow: '0 0 10px var(--accent), 0 0 20px var(--accent)',
+               animationDuration: `${p.duration}s`,
+               animationDelay: `${p.delay}s`,
+               '--max-opacity': p.opacity,
+             }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ─── Home Page ────────────────────────────────────────────────────────────────
 function HomePage({ dashboards, onOpen, onDelete, onCreateNew, onOpenSettings, theme, setTheme }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const fmt=d=>new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
   return (
-    <div className="min-h-screen p-3 sm:p-5 flex flex-col gap-4 sm:gap-5"
+    <div className="min-h-screen p-3 sm:p-5 flex flex-col gap-4 sm:gap-5 relative"
       style={{background:'radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, var(--bg) 55%)'}}>
-      <div className="nm-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <ParticleBackground />
+      <div className="nm-card p-4 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
         
         {/* Top Bar on Mobile */}
         <div className="flex items-center justify-between w-full sm:w-auto">
@@ -1332,16 +1386,16 @@ function HomePage({ dashboards, onOpen, onDelete, onCreateNew, onOpenSettings, t
           </button>
         </div>
       </div>
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between relative z-10">
         <div>
           <h1 className="text-xl font-black text-[var(--text-primary)]">My Dashboards</h1>
           <p className="text-[var(--text-muted)] text-xs mt-0.5">{dashboards.length} dashboard{dashboards.length!==1?'s':''} saved</p>
         </div>
       </div>
       {dashboards.length===0&&(
-        <div className="flex-1 flex flex-col items-center justify-center gap-5 py-16">
+        <div className="flex-1 flex flex-col items-center justify-center gap-5 py-16 relative z-10">
           <div className="w-20 h-20 nm-card flex items-center justify-center border-glow-accent animate-pulse-accent">
-            <BookOpen size={34} className="text-[#8b5cf6]" style={{filter:'drop-shadow(0 0 10px #8b5cf6)'}}/>
+            <BookOpen size={34} className="text-[var(--accent)]" style={{filter:'drop-shadow(0 0 10px var(--accent))'}}/>
           </div>
           <div className="text-center">
             <h2 className="text-lg font-bold text-[var(--text-secondary)]">No dashboards yet</h2>
@@ -1353,7 +1407,7 @@ function HomePage({ dashboards, onOpen, onDelete, onCreateNew, onOpenSettings, t
         </div>
       )}
       {dashboards.length>0&&(
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 relative z-10">
           {dashboards.map(db=>{
             const tt=db.selectedSubjects.reduce((a,s)=>a+s.topics.length,0);
             const ct=db.selectedSubjects.reduce((a,s)=>a+s.topics.filter((_,i)=>(db.topicChecks||{})[`${s.id}-${i}`]).length,0);
