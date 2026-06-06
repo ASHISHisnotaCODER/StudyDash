@@ -9,7 +9,7 @@ import {
   CheckCheck, Loader2, Sparkles, ChevronRight,
   GraduationCap, TrendingUp, Play, Pause, Square,
   Timer, RotateCcw, MapPin, Flag, Layers, Rocket,
-  BookMarked, FlaskConical, ClipboardList, AlertCircle, Settings, Crown, RefreshCw, Menu
+  BookMarked, FlaskConical, ClipboardList, AlertCircle, Settings, Crown, RefreshCw, Menu, Check
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -1011,27 +1011,36 @@ function SettingsSidebar({ isOpen, onClose, accentColor, setAccentColor, onLogin
         </div>
         <div className="p-6 flex flex-col gap-8">
 
-          <div className="flex flex-col gap-4">
-            <label className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-widest">Accent Color</label>
-            <div className="nm-inset p-2 rounded-full flex gap-2 relative w-max mx-auto overflow-hidden">
-              {/* Sliding glowing thumb */}
-              <div className="absolute w-10 h-10 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center pointer-events-none z-10"
-                style={{
-                  left: `calc(8px + ${['var(--color-cyan)','var(--color-purple)','var(--color-pink)','var(--color-emerald)','var(--color-amber)'].indexOf(accentColor) * 48}px)`,
-                  backgroundColor: accentColor,
-                  boxShadow: `0 0 20px color-mix(in srgb, ${accentColor} 80%, transparent), inset 0 2px 5px rgba(255,255,255,0.5), inset 0 -2px 5px rgba(0,0,0,0.2)`
-                }}>
-                <div className="w-3 h-3 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
-              </div>
-
-              {/* Color targets */}
+          <div className="flex flex-col gap-5">
+            <label className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-widest flex items-center gap-2">
+              <Sparkles size={12} className="text-[var(--accent)]"/> Theme Color
+            </label>
+            <div className="flex gap-4 relative w-full justify-center px-2">
               {['var(--color-cyan)','var(--color-purple)','var(--color-pink)','var(--color-emerald)','var(--color-amber)'].map(c => {
                 const isSelected = accentColor === c;
                 return (
                   <button key={c} onClick={() => setAccentColor(c)}
-                    className="relative w-10 h-10 rounded-full flex items-center justify-center group z-0">
-                    <div className={`absolute inset-0 rounded-full transition-all duration-500 ${isSelected ? 'opacity-0 scale-50' : 'opacity-100 scale-[0.65] group-hover:scale-75'}`}
-                      style={{ backgroundColor: c }} />
+                    className="relative w-11 h-11 rounded-[14px] flex items-center justify-center group transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                    style={{
+                      background: isSelected ? c : 'var(--bg)',
+                      boxShadow: isSelected 
+                        ? `0 0 20px color-mix(in srgb, ${c} 60%, transparent), inset 0 2px 5px rgba(255,255,255,0.4)` 
+                        : 'inset 4px 4px 10px var(--nm-shadow-dark), inset -3px -3px 8px var(--nm-shadow-light)',
+                      transform: isSelected ? 'scale(1.15) translateY(-3px)' : 'scale(1)'
+                    }}>
+                    
+                    {/* Inner Check Icon */}
+                    <div className={`transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isSelected ? 'scale-100 opacity-100 rotate-0' : 'scale-0 opacity-0 -rotate-90'}`}>
+                      <Check size={18} strokeWidth={3} className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"/>
+                    </div>
+
+                    {/* Unselected Inner Color Dot */}
+                    <div className={`absolute inset-0 m-auto w-3 h-3 rounded-full transition-all duration-300 ${isSelected ? 'scale-0 opacity-0' : 'scale-100 opacity-100 group-hover:scale-150'}`}
+                      style={{ backgroundColor: c, boxShadow: `0 0 10px ${c}` }} />
+                      
+                    {/* Hover Glow Ring */}
+                    <div className="absolute inset-[-4px] rounded-[18px] border-2 transition-all duration-300 opacity-0 group-hover:opacity-100 scale-110 group-hover:scale-100 pointer-events-none"
+                      style={{ borderColor: c, opacity: isSelected ? 0 : '' }} />
                   </button>
                 );
               })}
